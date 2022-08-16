@@ -1,0 +1,151 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  TodoApp
+  Simple TodoApp using SAM
+Globals:
+  Function:
+    Timeout: 10
+Resources:
+  GetAllTodoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: todo_rest/
+      Handler: app.getAllTodo
+      Runtime: nodejs16.x
+      Architectures:
+        - x86_64
+      Events:
+        FetchAllTodo:
+          Type: Api
+          Properties:
+            Path: /getalltodo
+            Method: GET
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref Table
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+        - app.ts
+  GetTodoBasedOnIdFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: todo_rest/
+      Handler: app.getTodoBasedOnId
+      Runtime: nodejs16.x
+      Architectures:
+        - x86_64
+      Events:
+        FetchAllTodo:
+          Type: Api
+          Properties:
+            Path: /gettodo/{id}
+            Method: GET
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref Table
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+        - app.ts
+  CreateTodoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: todo_rest/
+      Handler: app.createTodo
+      Runtime: nodejs16.x
+      Architectures:
+        - x86_64
+      Events:
+        FetchAllTodo:
+          Type: Api
+          Properties:
+            Path: /createtodo
+            Method: POST
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref Table
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+        - app.ts
+  UpdateTodoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: todo_rest/
+      Handler: app.updateTodo
+      Runtime: nodejs16.x
+      Architectures:
+        - x86_64
+      Events:
+        FetchAllTodo:
+          Type: Api
+          Properties:
+            Path: /updatetodo
+            Method: PUT
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref Table
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+        - app.ts
+  DeleteTodoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: todo_rest/
+      Handler: app.deleteTodo
+      Runtime: nodejs16.x
+      Architectures:
+        - x86_64
+      Events:
+        FetchAllTodo:
+          Type: Api
+          Properties:
+            Path: /deletetodo/{id}
+            Method: DELETE
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref Table
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+        - app.ts
+  Table:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: TodoLists-ini
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+Outputs:
+  WebEndPoints:
+    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
